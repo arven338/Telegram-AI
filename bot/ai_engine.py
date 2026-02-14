@@ -1,0 +1,19 @@
+from bot.config import CLIENT_CONFIGS, RESPONSE_CONFIG
+from g4f.client import ClientFactory
+
+class Engine:
+    def __init__(self, provider=CLIENT_CONFIGS["PROVIDER"], model=CLIENT_CONFIGS["MODEL"]):
+        self.provider = provider
+        self.model = model
+
+    def get_reply(self, prompt):
+        client = ClientFactory.create_client(self.provider)
+
+        response = client.chat.completions.create(
+                model=self.model,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=RESPONSE_CONFIG["MAX_TOKENS"],
+                temperature=RESPONSE_CONFIG["TEMPERATURE"]
+        )
+
+        return response.choices[0].message.content

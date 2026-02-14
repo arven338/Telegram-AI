@@ -1,0 +1,38 @@
+from bot.ai_engine import Engine
+import telebot
+import os
+import re
+
+def escape_markdown_v2(text: str) -> str:
+    # Escape all Telegram MarkdownV2 special characters
+    escape_chars = r'_*\[\]()~`>#+-=|{}.!'
+    return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
+
+def main():
+    telegram_api = os.environ.get('TELEGRAM_TOKEN')
+
+    dp = telebot.TeleBot(telegram_api)
+    client = Engine()
+
+    @dp.message_handler(commands=['start'])
+    def start(message):
+        first_name = message.from_user.first_name
+        last_name = message.from_user.last_name
+
+        if last_name:
+            full_name = first_name + last_name
+        else:
+            full_name = first_name
+
+        dp.send_message(message.chat.id, f"Hi, {full_name}! \n \nThis is **Telegram-Bot with AI-Model** 🤖! You can generate many text responses with **AI** - just write your request and get an answer.", parse_mode="Markdown")
+
+    @dp.message_handler(func=lambda message: True)
+    def get_answer(message):
+        dp.send_chat_action(message.chat.id, 'typing')
+
+        response = client.get_reply(message.text)
+        safety_response = escape_markdown_v2(response)
+
+        dp.reply_to(message, safety_response, parse_mode="MarkdownV2")
+
+    dp.polling(none_stop=True)
