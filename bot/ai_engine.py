@@ -1,5 +1,5 @@
 from bot.config import CLIENT_CONFIGS, RESPONSE_CONFIG
-from g4f.client import ClientFactory
+from g4f.client import ClientFactory, Client
 
 class Engine:
     def __init__(self, provider=CLIENT_CONFIGS["PROVIDER"], model=CLIENT_CONFIGS["MODEL"]):
@@ -17,3 +17,14 @@ class Engine:
         )
 
         return response.choices[0].message.content
+
+    def get_image(self, prompt):
+        client = Client(provider="BlackForestLabs_Flux1Dev")
+
+        response = client.images.generate(
+                model="flux",
+                prompt=prompt,
+                response_format="url"
+        )
+
+        return response.data[0].url
