@@ -3,6 +3,7 @@ import telebot
 import os
 import re
 import logging
+import html
 from colorama import Fore, Style, init
 
 init(autoreset=True)
@@ -28,12 +29,10 @@ handler = logging.StreamHandler()
 handler.setFormatter(ColoredFormatter("[%(asctime)s] [%(levelname)s] %(message)s"))
 logger.addHandler(handler)
 
-# ===== Escape MarkdownV2 =====
-def escape_markdown_v2(text: str) -> str:
+def sanitize_html(text: str) -> str:
     if not text:
-        return "_(empty response)_"
-    escape_chars = r'_*\[\]()~`>#+-=|{}.!'
-    return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
+        return "Empty response."
+    return html.escape(text)
 
 # ===== Chat History =====
 chat_history = {}
@@ -96,14 +95,14 @@ def main():
         bot.send_chat_action(message.chat.id, 'typing')
 
         try:
-            response = ai_client.get_reply(message.text)
+            response = ai_client.get_reply(message.text, chat_history=chat_history[chat_id])
             logger.info(f"AI response generated | Chat ID: {message.chat.id}")
         except Exception as e:
             logger.error(f"AI Engine Error | Chat ID: {message.chat.id} | Error: {e}")
             response = "Something went wrong while generating a response."
 
-        safe_response = escape_markdown_v2(response)
-        bot.reply_to(message, safe_response, parse_mode="Markdown")
+        safe_response = sanitize_html(response)
+        bot.reply_to(message, safe_response, parse_mode="HTML")
 
         chat_history[message.chat.id].append({"role": "assistant", "content": response})
 

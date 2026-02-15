@@ -6,12 +6,12 @@ class Engine:
         self.provider = provider
         self.model = model
 
-    def get_reply(self, prompt):
+    def get_reply(self, prompt, chat_history):
         client = ClientFactory.create_client(self.provider)
 
         response = client.chat.completions.create(
                 model=self.model,
-                messages=[{"role": "user", "content": prompt}],
+                messages=chat_history,
                 max_tokens=RESPONSE_CONFIG["MAX_TOKENS"],
                 temperature=RESPONSE_CONFIG["TEMPERATURE"]
         )

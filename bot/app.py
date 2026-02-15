@@ -95,7 +95,7 @@ def main():
         bot.send_chat_action(message.chat.id, 'typing')
 
         try:
-            response = ai_client.get_reply(message.text)
+            response = ai_client.get_reply(message.text, chat_history=chat_history[message.chat.id])
             logger.info(f"AI response generated | Chat ID: {message.chat.id}")
         except Exception as e:
             logger.error(f"AI Engine Error | Chat ID: {message.chat.id} | Error: {e}")

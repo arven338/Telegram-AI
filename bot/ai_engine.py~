@@ -2,7 +2,7 @@ from bot.config import CLIENT_CONFIGS, RESPONSE_CONFIG
 from g4f.client import ClientFactory
 
 class Engine:
-    def __init__(self, provider=CLIENT_CONFIG["PROVIDER"], model=CLIENT_CONFIG["MODEL"]):
+    def __init__(self, provider=CLIENT_CONFIGS["PROVIDER"], model=CLIENT_CONFIGS["MODEL"]):
         self.provider = provider
         self.model = model
 
